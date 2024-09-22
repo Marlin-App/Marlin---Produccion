@@ -1,2 +1,0 @@
-# Marlin---Producci-n
-Aplicación
