@@ -20,7 +20,9 @@ class RegisterUserAPIView(APIView):
             #Se envia la respuesta positiva y los tokens del usuario creado
             return Response({"message": "Usuario creado correctamente",
                              "refresh": str(refresh),
-                             "access": str(refresh.access_token)
+                             "access": str(refresh.access_token),
+                             "username": user.username,
+                             "email": user.email
                              }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

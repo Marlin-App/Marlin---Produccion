@@ -9,6 +9,7 @@ router.register(r'stores', viewsets.StoreViewSet)
 router.register(r'storeItems',viewsets.StoreItemViewSet)
 router.register(r'storeTypes',viewsets.StoreTypeViewSet)
 router.register(r'itemTags',viewsets.StoreItemTagViewSet)
+router.register(r'userProfile', viewsets.UserProfileViewSet)
 
 
 urlpatterns = [

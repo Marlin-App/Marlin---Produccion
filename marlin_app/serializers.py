@@ -22,6 +22,31 @@ class UserSerializer(serializers.ModelSerializer):
         )
         UserProfile.objects.create(user = user)
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'picture']
+    
+    #sobreescribir el metodo update
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        if user_data:
+            for arrt, value in user_data.items():
+                setattr(instance.user, arrt, value)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.user.save()
+        instance.save()
+        return instance
+    
+    # def update(self, instance, validated_data):
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
