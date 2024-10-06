@@ -31,7 +31,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'picture']
-    
+
     #sobreescribir el metodo update
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', None)
@@ -41,13 +41,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        
+
         instance.user.save()
         instance.save()
         return instance
-    
+
     # def update(self, instance, validated_data):
-    
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -67,11 +67,23 @@ class StoreSerializer(serializers.ModelSerializer):
         model = Store
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation['picture'].startswith('image/upload/'):
+            representation['picture'] = representation['picture'].replace('image/upload/', '')
+        if representation['banner'].startswith('image/upload/'):
+            representation['banner'] = representation['banner'].replace('image/upload/', '')
+        return representation
+
 class StoreItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreItem
         fields = '__all__'
-
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation['picture'].startswith('image/upload/'):
+            representation['picture'] = representation['picture'].replace('image/upload/', '')
+        return representation
 
 class StoreTypeSerializer(serializers.ModelSerializer):
     class Meta:
