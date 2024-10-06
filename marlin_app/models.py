@@ -18,7 +18,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_type = models.ForeignKey('UserType', on_delete=models.CASCADE, default=get_default_user_type)
     phone = models.CharField(max_length=8)
-    picture = models.ImageField(upload_to='user_pictures/')
+    picture = models.ImageField(upload_to='user_pictures/', null=True, blank=True)
     
     def save(self, *args, **kwargs):
         # Si hay una imagen, la convertimos a .webp antes de guardar
