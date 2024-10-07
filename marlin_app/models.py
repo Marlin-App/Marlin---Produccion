@@ -104,7 +104,7 @@ class Store(models.Model):
             image_uploaded = upload(self.picture, folder="stores", public_id=public_id_picture, format="webp")
             self.picture = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
         
-        if self.banner and hasattr(self.picture, 'name'):
+        if self.banner and hasattr(self.banner, 'name'):
             ext = os.path.splitext(self.banner.name)[1]
             public_id_banner = f'{self.name}_banner'
             banner_uploaded = upload(self.banner, folder="stores", public_id=public_id_banner, format="webp")
