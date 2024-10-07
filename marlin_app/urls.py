@@ -10,6 +10,7 @@ router.register(r'storeItems',viewsets.StoreItemViewSet)
 router.register(r'storeTypes',viewsets.StoreTypeViewSet)
 router.register(r'itemTags',viewsets.StoreItemTagViewSet)
 router.register(r'userProfile', viewsets.UserProfileViewSet)
+router.register(r'attributes', viewsets.AttributeValueViewSet)
 
 
 urlpatterns = [

@@ -32,25 +32,11 @@ class Command(BaseCommand):
                 image_uploaded = upload(image_file, folder="categories", public_id=f"{stype}_image", format="webp")
                 image_selected_uploaded = upload(image_selected_file, folder="categories", public_id=f"{stype}_selected_image", format="webp")
 
-                # Imprimir las respuestas de Cloudinary para verificar las URLs
-                # print(f"Uploaded {stype} image: {image_uploaded}")
-                # print(f"Uploaded {stype} selected image: {image_selected_uploaded}")
-
-                # Crear el nuevo StoreType con las URLs correctas
-                url1 = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
-                url2 = image_selected_uploaded.get('secure_url', image_selected_uploaded.get('url', ''))
-
-                # Usar split para extraer la parte deseada
-                extracted_url1 = url1.split('image', 1)[1]
-                extracted_url2 = url2.split('image', 1)[1]
-
-                # Si deseas agregar "image" de vuelta al inicio de la cadena extraída
-                final_url1 = 'image' + extracted_url1
-                final_url2 = 'image' + extracted_url2
+                # Crear el nuevo StoreType con las URLs de Cloudinary
                 new_type = StoreType(
                     name=stype,
-                    image= final_url1,  # Obtener 'secure_url' o 'url'
-                    image_selected= final_url2  # Obtener 'secure_url' o 'url'
+                    image=image_uploaded['url'],  # Guardar la URL pública de la imagen
+                    image_selected=image_selected_uploaded['url']  # Guardar la URL pública de la imagen seleccionada
                 )
 
                 new_type.save()

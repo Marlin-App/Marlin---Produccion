@@ -1,6 +1,7 @@
+import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Store, StoreItem, StoreType, ItemTag
+from .models import UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -78,7 +79,30 @@ class StoreSerializer(serializers.ModelSerializer):
 class StoreItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreItem
-        fields = '__all__'
+        fields = '__all__'        
+    def create(self, validated_data):
+
+        print(validated_data)
+
+        #obtener el objeto atributos y quitarlo de validated_data
+        atributes_data = self.context['request'].data.get('atributes')
+        if atributes_data:
+            atributes_data = json.loads(atributes_data)
+        #crear el item
+        print(f'hola {atributes_data}')
+        store_item = StoreItem.objects.create(**validated_data)
+        for attr_name, attr_value in atributes_data.items():
+
+            attribute, created = Atribute.objects.get_or_create(name=attr_name)
+
+            AtributeValue.objects.create(
+                attribute = attribute,
+                storeItem = store_item,
+                value = attr_value
+            )
+        return store_item
+
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if representation['picture'].startswith('image/upload/'):
@@ -94,4 +118,11 @@ class StoreItemTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemTag
         fields = '__all__'
+
+class AtributeValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AtributeValue
+        fields = '__all__'
+
+
 

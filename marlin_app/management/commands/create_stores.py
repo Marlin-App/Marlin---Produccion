@@ -27,12 +27,6 @@ class Command(BaseCommand):
                     image_uploaded = upload(image_file, folder="stores", public_id=f"{stype.name}_{i}_image", format="webp")
                     image_banner_uploaded = upload(image_banner, folder="stores", public_id=f"{stype.name}_{i}_selected_image", format="webp")
 
-                    url1 = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
-                    url2 = image_banner_uploaded.get('secure_url', image_banner_uploaded.get('url', ''))
-                    extracted_url1 = url1.split('image', 1)[1]
-                    extracted_url2 = url2.split('image', 1)[1]
-                    final_url1 = 'image' + extracted_url1
-                    final_url2 = 'image' + extracted_url2
                     store = (
                     Store(
                         user_id = user,
@@ -43,8 +37,8 @@ class Command(BaseCommand):
                         opening_hour = opening_time,
                         closing_hour = clossing_time,
                         district = 'Puntarenas',
-                        picture=final_url1,
-                        banner=final_url2))
+                        picture=image_uploaded['url'],
+                        banner=image_banner_uploaded['url']))
                     store.save()
                     store.store_type.set([stype])
                     stores.append(store)
