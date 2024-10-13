@@ -104,7 +104,7 @@ class Store(models.Model):
             image_uploaded = upload(self.picture, folder="stores", public_id=public_id_picture, format="webp")
             self.picture = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
         
-        if self.banner and hasattr(self.picture, 'name'):
+        if self.banner and hasattr(self.banner, 'name'):
             ext = os.path.splitext(self.banner.name)[1]
             public_id_banner = f'{self.name}_banner'
             banner_uploaded = upload(self.banner, folder="stores", public_id=public_id_banner, format="webp")
@@ -177,12 +177,16 @@ class Atribute(models.Model):
     
 class AtributeValue(models.Model):
     attribute = models.ForeignKey(Atribute, on_delete=models.CASCADE)
-    storeItem = models.ForeignKey(StoreItem, on_delete=models.CASCADE)
     value = models.CharField(max_length=250)
 
     def __str__(self):
         return f"{self.attribute.name}: {self.value}"
-    
+
+class ItemVariation(models.Model):
+    store_item = models.ForeignKey(StoreItem, on_delete=models.CASCADE, related_name='variations')
+    attribute_values = models.ManyToManyField(AtributeValue)
+    stock = models.IntegerField()
+        
 class Order(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     total_price = models.FloatField()
