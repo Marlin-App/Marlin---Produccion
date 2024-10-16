@@ -37,8 +37,8 @@ class Command(BaseCommand):
                         opening_hour = opening_time,
                         closing_hour = clossing_time,
                         district = 'Puntarenas',
-                        picture=image_uploaded['url'],
-                        banner=image_banner_uploaded['url']))
+                        picture=image_uploaded['secure_url'],
+                        banner=image_banner_uploaded['secure_url']))
                     store.save()
                     store.store_type.set([stype])
                     stores.append(store)

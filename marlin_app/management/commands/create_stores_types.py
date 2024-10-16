@@ -9,16 +9,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         types = [
-            'Zapateria',
-            'Ferreteria',
-            'Mascotas',
-            'Ropa',
-            'Surf',
             'Pesca',
             'Deporte',
             'Bisuteria',
+            'Floristeria',
+            'Ferreteria',
+            'Mascotas',
+            'Ropa',
+            'Zapateria',
+            'Surf',
             'Pasamaneria',
-            'Floristeria'
         ]
         images_dir = os.path.join(settings.MEDIA_ROOT, 'categories')
         image_files = os.listdir(images_dir)
@@ -35,8 +35,8 @@ class Command(BaseCommand):
                 # Crear el nuevo StoreType con las URLs de Cloudinary
                 new_type = StoreType(
                     name=stype,
-                    image=image_uploaded['url'],  # Guardar la URL pública de la imagen
-                    image_selected=image_selected_uploaded['url']  # Guardar la URL pública de la imagen seleccionada
+                    image=image_uploaded['secure_url'],  # Guardar la URL pública de la imagen
+                    image_selected=image_selected_uploaded['secure_url']  # Guardar la URL pública de la imagen seleccionada
                 )
 
                 new_type.save()

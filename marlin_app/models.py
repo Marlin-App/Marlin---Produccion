@@ -112,34 +112,6 @@ class Store(models.Model):
 
         super(Store, self).save(*args, **kwargs)
 
-
-    # def save(self, *args, **kwargs):
-    #     # Si hay una imagen, la convertimos a .webp antes de guardar
-    #     if self.picture:
-    #         # Abrir la imagen usando PIL
-    #         img = Image.open(self.picture)
-            
-    #         # Convertir la imagen a webp en memoria
-    #         webp_image = BytesIO()
-    #         img.save(webp_image, format='WEBP', quality=85)  # Ajustar calidad si es necesario
-            
-    #         # Crear un nuevo archivo en memoria con la imagen .webp
-    #         webp_image.seek(0)  # Regresar al inicio del archivo BytesIO
-            
-    #         # Asignar el nuevo nombre con la extensión .webp basado en el nombre de la tienda
-    #         new_filename = f"{self.name}.webp"
-    #         self.picture = ContentFile(webp_image.getvalue(), new_filename)
-
-    #     # Guardar la imagen convertida con el nuevo nombre
-    #     super().save(*args, **kwargs)
-
-    # def delete(self, *args, **kwargs):
-    #     # Eliminar la imagen del sistema de archivos si existe
-    #     if self.picture:
-    #         self.picture.delete(save=False)
-    #     # Llamar al método delete() del padre para eliminar el objeto
-    #     super().delete(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
@@ -156,18 +128,21 @@ class StoreItem(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
+        
+    def __str__(self):
+        return self.name
+    
+class ItemImage(models.Model):
+    item = models.ForeignKey(StoreItem, on_delete=models.CASCADE, related_name="item_images")
     picture = CloudinaryField('image')
 
     def save(self, *args, **kwargs):
         if self.picture and hasattr(self.picture, 'name'):
             ext = os.path.splitext(self.picture.name)[1]
-            public_id_picture = f'{self.name}_picture'
+            public_id_picture = f'{self.item.name}_picture'
             image_uploaded = upload(self.picture, folder="items", public_id=public_id_picture, format="webp")
             self.picture = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
-        super(StoreItem, self).save(*args, **kwargs)
-        
-    def __str__(self):
-        return self.name
+        super(ItemImage, self).save(*args, **kwargs)
     
 class Atribute(models.Model):
     name = models.CharField(max_length=250)
@@ -175,18 +150,20 @@ class Atribute(models.Model):
     def __str__(self):
         return self.name
     
+
+    
+class ItemVariation(models.Model):
+    store_item = models.ForeignKey(StoreItem, on_delete=models.CASCADE, related_name='variations')
+    stock = models.IntegerField()
+
 class AtributeValue(models.Model):
+    item_variation = models.ForeignKey(ItemVariation, on_delete=models.CASCADE, related_name='item_variations')
     attribute = models.ForeignKey(Atribute, on_delete=models.CASCADE)
     value = models.CharField(max_length=250)
 
     def __str__(self):
         return f"{self.attribute.name}: {self.value}"
-
-class ItemVariation(models.Model):
-    store_item = models.ForeignKey(StoreItem, on_delete=models.CASCADE, related_name='variations')
-    attribute_values = models.ManyToManyField(AtributeValue)
-    stock = models.IntegerField()
-        
+    
 class Order(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     total_price = models.FloatField()
