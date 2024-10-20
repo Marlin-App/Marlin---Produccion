@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer
-from . models import Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
+from .serializers import OrderSerializer, StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer
+from . models import Order, Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
 from .permissions import IsAuthenticatedOrOwner
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -37,3 +37,7 @@ class AttributeValueViewSet(viewsets.ModelViewSet):
     queryset = AtributeValue.objects.all()
     serializer_class = AtributeValueSerializer
     filterset_fields = ['storeItem']
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer

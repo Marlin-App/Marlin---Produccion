@@ -94,33 +94,33 @@ WSGI_APPLICATION = 'marlin.wsgi.application'
 load_dotenv()
 
 # base de datos cleaver cloud
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': getenv('PGDATABASE'),
-    'USER': getenv('PGUSER'),
-    'PASSWORD': getenv('PGPASSWORD'),
-    'HOST': getenv('PGHOST'),
-    'PORT': getenv('PGPORT', 5432),
-    'OPTIONS': {
-      'sslmode': 'require',
-    },
-  }
-}
+# DATABASES = {
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'NAME': getenv('PGDATABASE'),
+#     'USER': getenv('PGUSER'),
+#     'PASSWORD': getenv('PGPASSWORD'),
+#     'HOST': getenv('PGHOST'),
+#     'PORT': getenv('PGPORT', 5432),
+#     'OPTIONS': {
+#       'sslmode': 'require',
+#     },
+#   }
+# }
 
 # base de datos neon Tech
-# tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': tmpPostgres.path.replace('/', ''),
-#         'USER': tmpPostgres.username,
-#         'PASSWORD': tmpPostgres.password,
-#         'HOST': tmpPostgres.hostname,
-#         'PORT': 5432,
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+    }
+}
 
 # Configuraciones de rest framework
 REST_FRAMEWORK = {
@@ -148,7 +148,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
     "http://192.168.100.131:8081",
-    "exp://192.168.100.131:8081"  
+    "exp://192.168.100.131:8081",
+    "http://127.0.0.1:5500" 
 ]
 
 

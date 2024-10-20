@@ -150,8 +150,6 @@ class Atribute(models.Model):
     def __str__(self):
         return self.name
     
-
-    
 class ItemVariation(models.Model):
     store_item = models.ForeignKey(StoreItem, on_delete=models.CASCADE, related_name='variations')
     stock = models.IntegerField()
@@ -165,21 +163,31 @@ class AtributeValue(models.Model):
         return f"{self.attribute.name}: {self.value}"
     
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Pendiente', 'Pendiente'),
+        ('En progreso', 'En progreso'),
+        ('Enviada', 'Enviada'),
+        ('Entregada', 'Entregada'),
+        ('Cancelada', 'Cancelada'),
+    ]
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    total_price = models.FloatField()
+    total_price = models.IntegerField(null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField()
-    #delivery = models.ForeignKey(User, on_delete=models.CASCADE) ver si se puede incluir un atributo mas la tabla de user para identificar un user, delivery o store owner
-
+    status = models.CharField(default='Pendiente', choices=STATUS_CHOICES,  max_length=100)
+    direction = models.TextField()
     def __str__(self):
         return self.user_id
     
 class OrderItem(models.Model):
-    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
     item_id = models.ForeignKey(StoreItem, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     total_price = models.IntegerField()
     #delivery = models.ForeignKey(User, on_delete=models.CASCADE) ver si se puede incluir un atributo mas la tabla de user para identificar un user, delivery o store owner
+
+    def save(self, *args, **kwargs):
+        self.total_price = self.item_id.price * self.quantity
+        return super(OrderItem, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.order_id

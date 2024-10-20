@@ -1,7 +1,7 @@
 import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
+from .models import Order, OrderItem, UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -16,14 +16,17 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)  
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
+        fields = ['username', 'password', 'email', 'first_name', 'last_name']
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        user = User(
             username=validated_data['username'],
             email=validated_data['email'],
-            password=validated_data['password']
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
         )
+        user.set_password(validated_data['password'])
+        user.save()
         UserProfile.objects.create(user = user)
         return user
 
@@ -122,24 +125,28 @@ class StoreItemSerializer(serializers.ModelSerializer):
         #crear el item
         pictures = self.context['request'].FILES.getlist('pictures')
         store_item = StoreItem.objects.create(**validated_data)
-
+        print(pictures)
+        item_variations = []
+        attribute_values = []
 # Guardar las imágenes
         for picture in pictures:
             ItemImage.objects.create(
                 item=store_item,
                 picture=picture  # Asumiendo que tu modelo ItemImage tiene un campo llamado 'image'
             )
-        
+
         for variation_data in atributes_data:
             #por cada objeto dentro de atributes obtener los datos para crear la variacion
             attibute_value_list = variation_data.get('attribute_values')
             stock = variation_data.get('stock')
 
             #Crear la variacion
-            item_variation = ItemVariation.objects.create(
+            item_variation = ItemVariation(
                 store_item = store_item,
                 stock = stock
             )
+
+            item_variations.append(item_variation)
 
             # lista de atributos que llevara esa variacion
             for attr_data in attibute_value_list:
@@ -147,11 +154,15 @@ class StoreItemSerializer(serializers.ModelSerializer):
                 atribute, created = Atribute.objects.get_or_create(name=attr_data['name'])
 
                 #crear el attribute value
-                attribute_value, created = AtributeValue.objects.get_or_create(
+                attribute_value = AtributeValue(
                     item_variation=item_variation,
                     attribute=atribute,
                     value=attr_data['value']
                 )
+                attribute_values.append(attribute_value)
+
+        ItemVariation.objects.bulk_create(item_variations)
+        AtributeValue.objects.bulk_create(attribute_values)
         return store_item
 
 class StoreTypeSerializer(serializers.ModelSerializer):
@@ -177,6 +188,32 @@ class AtributeValueSerializer(serializers.ModelSerializer):
         model = AtributeValue
         fields = '__all__'
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    total_price = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = OrderItem
+        fields = ['item_id', 'quantity', 'total_price']
+
+class OrderSerializer(serializers.ModelSerializer):
+    products = OrderItemSerializer(many=True)
+    total_price = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def create(self, validated_data):
+        products = validated_data.pop('products')
+        order = Order.objects.create(**validated_data)
+
+        total_price = 0
+        for product in products:
+            order_product = OrderItem.objects.create(order_id=order, **product)
+            print(vars(order_product))
+            total_price += order_product.total_price
+
+        order.total_price = total_price
+        order.save()
+        return order
 
 #Proceso de cambio de contraseña
 class PasswordResetRequestSerializer(serializers.ModelSerializer):
