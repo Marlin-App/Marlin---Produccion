@@ -15,10 +15,19 @@ class StoreViewSet(viewsets.ModelViewSet):
 
 class StoreItemViewSet(viewsets.ModelViewSet):
     # permission_classes =  [IsAuthenticatedOrOwner]
-    queryset = StoreItem.objects.all()[:15]
+    # queryset = StoreItem.objects.all()[:15]
     serializer_class = StoreItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id']
+
+    def get_queryset(self):
+        queryset = StoreItem.objects.all()
+
+        # Aplicar el filtro de DjangoFilterBackend si existe
+        filtered_queryset = self.filter_queryset(queryset)
+
+        # Limitar a los primeros 10 elementos
+        return filtered_queryset[:10]
 
 class StoreTypeViewSet(viewsets.ModelViewSet):
     queryset = StoreType.objects.all()
