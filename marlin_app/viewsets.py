@@ -15,7 +15,7 @@ class StoreViewSet(viewsets.ModelViewSet):
 
 class StoreItemViewSet(viewsets.ModelViewSet):
     # permission_classes =  [IsAuthenticatedOrOwner]
-    queryset = StoreItem.objects.all()
+    queryset = StoreItem.objects.all()[:10]
     serializer_class = StoreItemSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id']
