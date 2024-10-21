@@ -7,6 +7,7 @@ from cloudinary.uploader import upload
 from cloudinary.models import CloudinaryField
 import os
 import cloudinary.uploader
+import uuid
 
 # Create your models here.
 
@@ -138,10 +139,21 @@ class ItemImage(models.Model):
 
     def save(self, *args, **kwargs):
         if self.picture and hasattr(self.picture, 'name'):
+            # Obtener la extensión del archivo original
             ext = os.path.splitext(self.picture.name)[1]
-            public_id_picture = f'{self.item.name}_picture'
+            
+            # Contar cuántas imágenes están asociadas al StoreItem
+            image_count = ItemImage.objects.filter(item=self.item).count() + 1
+            
+            # Generar el nombre con el número secuencial
+            public_id_picture = f'{self.item.name}_pic_{image_count}'
+            
+            # Subir la imagen a Cloudinary con el nombre único y formato webp
             image_uploaded = upload(self.picture, folder="items", public_id=public_id_picture, format="webp")
+            
+            # Asignar la URL segura de la imagen a la instancia
             self.picture = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
+        
         super(ItemImage, self).save(*args, **kwargs)
     
 class Atribute(models.Model):
