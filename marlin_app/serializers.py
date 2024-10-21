@@ -109,6 +109,13 @@ class ItemImagesSerializer(serializers.ModelSerializer):
             representation['picture'] = representation['picture'].replace('image/upload/', '')
         return representation
 
+class TinyStoreItemSerializer(serializers.ModelSerializer):
+    variations = ItemVariationSerializer(many=True, read_only=True)
+    item_images = ItemImagesSerializer(many=True, read_only=True)
+    class Meta:
+        model = StoreItem
+        fields = '__all__' 
+        
 class StoreItemSerializer(serializers.ModelSerializer):
     variations = ItemVariationSerializer(many=True, read_only=True)
     item_images = ItemImagesSerializer(many=True, read_only=True)
