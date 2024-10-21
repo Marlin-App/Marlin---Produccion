@@ -6,7 +6,7 @@ from .views import RegisterUserAPIView, PasswordResetRequestView, PasswordResetV
 # Url para las apis
 router = routers.DefaultRouter()
 router.register(r'stores', viewsets.StoreViewSet)
-router.register(r'storeItems',viewsets.StoreItemViewSet)
+router.register(r'storeItems',viewsets.StoreItemViewSet, basename='storeitems')
 router.register(r'storeTypes',viewsets.StoreTypeViewSet)
 router.register(r'itemTags',viewsets.StoreItemTagViewSet)
 router.register(r'userProfile', viewsets.UserProfileViewSet)
