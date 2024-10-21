@@ -19,11 +19,6 @@ class StoreItemViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_id']
 
-    def get_queryset(self):
-        queryset = super().get_queryset()  
-        queryset = self.filter_queryset(queryset)
-        return queryset[:10]
-
 class StoreTypeViewSet(viewsets.ModelViewSet):
     queryset = StoreType.objects.all()
     serializer_class = StoreTypeSerializer
