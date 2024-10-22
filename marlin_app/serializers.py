@@ -101,7 +101,8 @@ class ItemVariationSerializer(serializers.ModelSerializer):
 class ItemImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemImage
-        fields = '__all__'
+        # fields = '__all__'
+        fields = ['picture']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -109,19 +110,27 @@ class ItemImagesSerializer(serializers.ModelSerializer):
             representation['picture'] = representation['picture'].replace('image/upload/', '')
         return representation
 
-class TinyStoreItemSerializer(serializers.ModelSerializer):
-    variations = ItemVariationSerializer(many=True, read_only=True)
+class ListStoreItemSerializer(serializers.ModelSerializer):
     item_images = ItemImagesSerializer(many=True, read_only=True)
     class Meta:
         model = StoreItem
-        fields = '__all__' 
-        
+        fields = ['id', 'name', 'price', 'item_images']
+
 class StoreItemSerializer(serializers.ModelSerializer):
     variations = ItemVariationSerializer(many=True, read_only=True)
     item_images = ItemImagesSerializer(many=True, read_only=True)
     class Meta:
         model = StoreItem
-        fields = '__all__'        
+        fields = '__all__'  
+
+    def to_representation(self, instance):
+        """Devuelve todos los campos para la acción de retrieve"""
+        # Aquí puedes agregar lógica adicional para incluir más campos según la acción
+        if self.context['view'].action == 'retrieve':
+            return super().to_representation(instance)
+        else:
+            serializer = ListStoreItemSerializer(instance)
+            return serializer.data
     def create(self, validated_data):
     
         #extraer los attibutes
