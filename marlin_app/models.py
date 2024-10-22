@@ -84,6 +84,13 @@ class StoreType(models.Model):
 
 
 class Store(models.Model):
+    STATUS_CHOICES = [
+        ('Aceptado', 'Aceptado'),
+        ('Rechazado', 'Rechazado'),
+        ('Pendiente', 'Pendiente'),
+        ('Inactivo', 'Inactivo'),
+    ]
+
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     store_type = models.ManyToManyField(StoreType)
     name = models.CharField(max_length=250)
@@ -97,6 +104,7 @@ class Store(models.Model):
     closing_hour = models.TimeField()
     picture = CloudinaryField('image')
     banner = CloudinaryField('image')
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default="Pendiente")
 
     def save(self, *args, **kwargs):
         if self.picture and hasattr(self.picture, 'name'):

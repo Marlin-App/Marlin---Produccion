@@ -33,11 +33,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
     filterset_fields = ['user__id']
 
-class AttributeValueViewSet(viewsets.ModelViewSet):
-    queryset = AtributeValue.objects.all()
-    serializer_class = AtributeValueSerializer
-    filterset_fields = ['storeItem']
-
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer

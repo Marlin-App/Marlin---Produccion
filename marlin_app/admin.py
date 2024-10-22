@@ -4,7 +4,7 @@ from .models import UserType, StoreType, ItemTag, Store, UserProfile, Atribute
 # Register your models here.
 
 class StoreAdmin(admin.ModelAdmin):
-    list_filter = ("store_type",)
+    list_filter = ("status",)
 
 admin.site.register(UserType)
 admin.site.register(Store, StoreAdmin)

@@ -114,7 +114,7 @@ class ListStoreItemSerializer(serializers.ModelSerializer):
     item_images = ItemImagesSerializer(many=True, read_only=True)
     class Meta:
         model = StoreItem
-        fields = ['id', 'name', 'price', 'item_images']
+        fields = ['id', 'name', 'description', 'price', 'item_images']
 
 class StoreItemSerializer(serializers.ModelSerializer):
     variations = ItemVariationSerializer(many=True, read_only=True)
