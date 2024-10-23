@@ -45,7 +45,7 @@ class PasswordResetRequestView(APIView):
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(str(user.pk).encode('utf-8'))
 
-            reset_url = f"{request.scheme}://{request.get_host()}/api/reset-password/{uid}/{token}/"
+            reset_url = f"marlin-app://reset-password/{uid}/{token}/"
 
             # Send email to the user
             send_mail(
