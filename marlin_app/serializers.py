@@ -181,6 +181,86 @@ class StoreItemSerializer(serializers.ModelSerializer):
         AtributeValue.objects.bulk_create(attribute_values)
         return store_item
 
+    def update(self, instance, validated_data):
+
+        instance.name = validated_data.get('name')
+        instance.name = validated_data.get('description')
+        instance.price = validated_data.get('price')
+        instance.stock = validated_data.get('stock')
+        instance.save()
+
+        current_variations = {variation.id: variation for variation in instance.variations.all()}
+
+        #extraer los attibutes
+        variations_data = self.context['request'].data.get('attributes')
+        # if variations_data:
+        #     variations_data = json.loads(variations_data)
+
+        new_variations = []
+        new_attributes_values = []
+
+        for variation_data in variations_data:
+            variation_id = variation_data.get('id')
+            stock = variation_data.get('stock')
+            variation_attributes = variation_data.get('attribute_values')
+
+            if variation_id and variation_id in current_variations:
+                item_variation = current_variations.pop(variation_id)
+                item_variation.stock = stock
+                item_variation.save()
+
+                item_variation.item_variations.all().delete()
+
+                for attr_data in variation_attributes:
+                    #obtener la instancia del nombre del attribute
+                    atribute, created = Atribute.objects.get_or_create(name=attr_data['name'])
+
+                    #crear el attribute value
+                    attribute_value = AtributeValue(
+                        item_variation=item_variation,
+                        attribute=atribute,
+                        value=attr_data['value']
+                    )
+                    new_attributes_values.append(attribute_value)
+            else:
+                item_variation = ItemVariation(
+                    store_item=instance,
+                    stock=stock
+                )
+                new_variations.append(item_variation)
+
+                for attr_data in variation_attributes:
+                    #obtener la instancia del nombre del attribute
+                    atribute, created = Atribute.objects.get_or_create(name=attr_data['name'])
+
+                    #crear el attribute value
+                    attribute_value = AtributeValue(
+                        item_variation=item_variation,
+                        attribute=atribute,
+                        value=attr_data['value']
+                    )
+                    new_attributes_values.append(attribute_value)
+        for remaining_variations in current_variations.values():
+            remaining_variations.delete()
+
+        ItemVariation.objects.bulk_create(new_variations)
+        AtributeValue.objects.bulk_create(new_attributes_values)
+        return instance
+    
+class StoreWithItemsSerializer(serializers.ModelSerializer):
+    items = StoreItemSerializer(many=True, read_only=True)
+    class Meta:
+        model = Store
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation['picture'].startswith('image/upload/'):
+            representation['picture'] = representation['picture'].replace('image/upload/', '')
+        if representation['banner'].startswith('image/upload/'):
+            representation['banner'] = representation['banner'].replace('image/upload/', '')
+        return representation
+
 class StoreTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreType

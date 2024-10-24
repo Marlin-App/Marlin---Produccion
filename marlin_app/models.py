@@ -131,7 +131,7 @@ class ItemTag(models.Model):
         return self.name
     
 class StoreItem(models.Model):
-    store_id = models.ForeignKey(Store, on_delete=models.CASCADE)
+    store_id = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="items")
     item_type = models.ForeignKey(ItemTag, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     description = models.TextField()

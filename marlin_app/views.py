@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,6 +10,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.core.mail import EmailMultiAlternatives
 
 class RegisterUserAPIView(APIView):
     #permite a los no logeados usar esto
@@ -34,6 +37,13 @@ class RegisterUserAPIView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+def redirect_view (request, *args, **kwargs):
+    data = {
+            'uid': kwargs['uidb64'],
+            'token': kwargs['token'],
+        }
+    return render(request, 'redirect.html', data)
+    
 #Recover password 
 class PasswordResetRequestView(APIView):
     permission_classes = [AllowAny]
@@ -45,16 +55,33 @@ class PasswordResetRequestView(APIView):
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(str(user.pk).encode('utf-8'))
 
-            reset_url = f"{request.scheme}://{request.get_host()}/api/reset-password/{uid}/{token}/"
+            # reset_url = f"marlin-app://reset-password/{uid}/{token}/"
+            # reset_url = f"http://127.0.0.1:8000/api/redirect/{uid}/{token}/"
+            reset_url = f"https://marlin-desarrollo.vercel.app/api/redirect/{uid}/{token}/"
+
+            html_message = render_to_string('reset_password_email.html', {
+                'user': user,
+                'reset_url': reset_url,
+            })
 
             # Send email to the user
-            send_mail(
-                'Restablecer contraseña',
-                f'Usa el siguiente enlace para restablecer tu contraseña: {reset_url}',
-                'tu-email@gmail.com',  # De
-                [user.email],  # Para
-                fail_silently=False,
-            )
+            # send_mail(
+            #     'Restablecer contraseña',
+            #     '',
+            #     'marlin.aplicacion@gmail.com',  # De
+            #     [user.email],  # Para
+            #     fail_silently=False,
+            #     html_message=html_message
+            # )
+
+            subject = 'Restablecer contraseña'
+            from_email = 'marlin.aplicacion@gmail.com'
+            to = [user.email]
+
+            msg = EmailMultiAlternatives(subject, '', from_email, to)
+            msg.attach_alternative(html_message, "text/html")  # Adjuntar el contenido HTML
+            
+            msg.send()
             return Response({"message": "Se ha enviado un correo para restablecer la contraseña"}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
