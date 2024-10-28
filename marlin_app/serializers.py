@@ -193,8 +193,7 @@ class StoreItemSerializer(serializers.ModelSerializer):
 
         #extraer los attibutes
         variations_data = self.context['request'].data.get('attributes')
-        if variations_data:
-            variations_data = json.loads(variations_data)
+        
         # if variations_data:
         #     variations_data = json.loads(variations_data)
 
