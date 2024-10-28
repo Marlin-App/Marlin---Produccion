@@ -196,7 +196,7 @@ class Order(models.Model):
     status = models.CharField(default='Pendiente', choices=STATUS_CHOICES,  max_length=100)
     direction = models.TextField()
     def __str__(self):
-        return self.user_id
+        return f"Precio: {self.total_price}"
     
 class OrderItem(models.Model):
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
