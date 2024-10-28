@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserType, StoreType, ItemTag, Store, UserProfile, Atribute
+from .models import UserType, StoreType, ItemTag, Store, UserProfile, Atribute, Order
 
 # Register your models here.
 
@@ -12,4 +12,4 @@ admin.site.register(StoreType)
 admin.site.register(ItemTag)
 admin.site.register(UserProfile)
 admin.site.register(Atribute)
-
+admin.site.register(Order)
