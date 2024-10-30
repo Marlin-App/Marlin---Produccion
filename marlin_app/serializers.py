@@ -102,7 +102,7 @@ class ItemImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemImage
         # fields = '__all__'
-        fields = ['picture']
+        fields = ['id', 'picture']
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -184,24 +184,19 @@ class StoreItemSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
 
         instance.name = validated_data.get('name')
-        instance.name = validated_data.get('description')
+        instance.description = validated_data.get('description')
         instance.price = validated_data.get('price')
         instance.stock = validated_data.get('stock')
         instance.save()
 
         current_variations = {variation.id: variation for variation in instance.variations.all()}
+        current_images = {image.id: image for image in instance.item_images.all()}
 
         #extraer los attibutes
         variations_data = self.context['request'].data.get('attributes')
-        if variations_data:
-    # Si es un string, convierte a JSON
-            if isinstance(variations_data, str):
-                variations_data = json.loads(variations_data)
-        else:
-            raise ValueError("El campo 'attributes' es requerido")
-        
-        # if variations_data:
-        #     variations_data = json.loads(variations_data)
+        request_images = self.context['request'].data.get('images')
+        new_images = self.context['request'].FILES.getlist('new_images')
+    
 
         new_variations = []
         new_attributes_values = []
@@ -249,6 +244,25 @@ class StoreItemSerializer(serializers.ModelSerializer):
                     new_attributes_values.append(attribute_value)
         for remaining_variations in current_variations.values():
             remaining_variations.delete()
+
+        for request_image in request_images:
+            #extrae el id de las foto que llegan
+            request_id = request_image.get('id')
+            #si el id existe y esta en current lo saca del arreglo
+            if request_id and request_id in current_images:
+                current_images.pop(request_id)
+
+        #lo que quedo en el arreglo se elimina
+        for remaining_images in current_images.values():
+            remaining_images.delete()
+
+        if new_images:
+            for picture in new_images:
+                ItemImage.objects.create(
+                    item=instance,
+                    picture=picture
+                )   
+
 
         ItemVariation.objects.bulk_create(new_variations)
         AtributeValue.objects.bulk_create(new_attributes_values)
