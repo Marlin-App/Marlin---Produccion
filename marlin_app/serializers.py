@@ -64,6 +64,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         token['email'] = user.email
         token['userprofile'] = user.userprofile.id
+        token['usertype'] = user.userprofile.user_type.name
         
         # Devuelve el token
         return token
