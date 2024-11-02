@@ -46,3 +46,5 @@ class StoreWithItemsViewSet(viewsets.ModelViewSet):
 class DeliveryProfileViewSet(viewsets.ModelViewSet):
     queryset = DeliveryProfile.objects.all()
     serializer_class = DeliveryProfileSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['user_id']
