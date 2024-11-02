@@ -12,6 +12,7 @@ router.register(r'itemTags',viewsets.StoreItemTagViewSet)
 router.register(r'userProfile', viewsets.UserProfileViewSet)
 router.register(r'orders', viewsets.OrderViewSet)
 router.register(r'storesWithItems', viewsets.StoreWithItemsViewSet, basename='fullstore')
+router.register(r'delivery-profiles', viewsets.DeliveryProfileViewSet)
 
 
 urlpatterns = [

@@ -1,7 +1,7 @@
 import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Order, OrderItem, UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
+from .models import DeliveryProfile, Order, OrderItem, UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -314,18 +314,25 @@ class AtributeValueSerializer(serializers.ModelSerializer):
 
 class OrderItemSerializer(serializers.ModelSerializer):
     total_price = serializers.IntegerField(read_only=True)
+    item_name = serializers.CharField(source='item_id.name', read_only=True)
+    item_image = serializers.ImageField(source='item_id.item_images.first.picture', read_only=True)
+
     class Meta:
         model = OrderItem
-        fields = ['item_id', 'quantity', 'total_price']
+        fields = ['item_id', 'quantity', 'total_price', 'item_variation_id', 'item_name','item_image']
 
 class OrderSerializer(serializers.ModelSerializer):
     products = OrderItemSerializer(many=True)
     total_price = serializers.IntegerField(read_only=True)
+    user_name = serializers.CharField(source='user_id.first_name', read_only=True)
+    user_picture = serializers.ImageField(source='user_id.userprofile.picture', read_only=True)
+
     class Meta:
         model = Order
         fields = '__all__'
 
     def create(self, validated_data):
+        print(validated_data)
         products = validated_data.pop('products')
         order = Order.objects.create(**validated_data)
 
@@ -374,5 +381,25 @@ class PasswordResetSerializer(serializers.Serializer):
         user = User.objects.get(pk=uid)
         user.set_password(self.validated_data['new_password'])
         user.save()
+
+class DeliveryProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryProfile
+        fields = '__all__'
+        read_only_fields = ['user', 'status']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if representation['selfie'].startswith('image/upload/'):
+            representation['selfie'] = representation['selfie'].replace('image/upload/', '')
+        if representation['vehicle_picture'].startswith('image/upload/'):
+            representation['vehicle_picture'] = representation['vehicle_picture'].replace('image/upload/', '')
+        if representation['iD_front_picture'].startswith('image/upload/'):
+            representation['iD_front_picture'] = representation['iD_front_picture'].replace('image/upload/', '')
+        if representation['iD_back_picture'].startswith('image/upload/'):
+            representation['iD_back_picture'] = representation['iD_back_picture'].replace('image/upload/', '')
+        if representation['license_picture'].startswith('image/upload/'):
+            representation['license_picture'] = representation['license_picture'].replace('image/upload/', '')
+        return representation
 
 

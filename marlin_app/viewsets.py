@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import OrderSerializer, StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer, StoreWithItemsSerializer
-from . models import Order, Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
+from .serializers import DeliveryProfileSerializer, OrderSerializer, StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer, StoreWithItemsSerializer
+from . models import DeliveryProfile, Order, Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
 from .permissions import IsAuthenticatedOrOwner
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -42,3 +42,7 @@ class StoreWithItemsViewSet(viewsets.ModelViewSet):
     serializer_class = StoreWithItemsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['store_type', 'user_id']
+
+class DeliveryProfileViewSet(viewsets.ModelViewSet):
+    queryset = DeliveryProfile.objects.all()
+    serializer_class = DeliveryProfileSerializer

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserType, StoreType, ItemTag, Store, UserProfile, Atribute, Order
+from .models import UserType, StoreType, ItemTag, Store, UserProfile, Atribute, Order, DeliveryProfile
 
 # Register your models here.
 
@@ -13,3 +13,5 @@ admin.site.register(ItemTag)
 admin.site.register(UserProfile)
 admin.site.register(Atribute)
 admin.site.register(Order)
+admin.site.register(DeliveryProfile)
+
