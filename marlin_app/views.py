@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer, UserSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
@@ -101,3 +101,11 @@ class PasswordResetView(APIView):
             return Response({"message": "Contraseña restablecida correctamente"}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class DeleteAccount(APIView):
+
+    def delete(self, request):
+        permission_classes = [permissions.IsAuthenticated]
+        user = request.user
+        user.delete()
+        return Response({"message": "Cuenta eliminada correctamente"}, status=status.HTTP_200_OK)

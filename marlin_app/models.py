@@ -185,9 +185,9 @@ class AtributeValue(models.Model):
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pendiente', 'Pendiente'),
-        ('En progreso', 'En progreso'),
-        ('Enviada', 'Enviada'),
-        ('Entregada', 'Entregada'),
+        ('Buscando repartidor', 'Buscando repartidor'),
+        ('En camino', 'En camino'),
+        ('Entregado', 'Entregado'),
         ('Cancelada', 'Cancelada'),
     ]
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -204,7 +204,7 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         if self.voucher and hasattr(self.voucher, 'name'):
             ext = os.path.splitext(self.voucher.name)[1]
-            public_id_picture = f'{self.name}_voucher'
+            public_id_picture = f'{self.order_num}_voucher'
             image_uploaded = upload(self.voucher, folder="vouchers", public_id=public_id_picture, format="webp")
             self.voucher = image_uploaded.get('secure_url', image_uploaded.get('url', ''))
 
@@ -216,6 +216,7 @@ class OrderItem(models.Model):
     item_variation_id = models.ForeignKey(ItemVariation, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.IntegerField()
     total_price = models.IntegerField()
+    # coordenates = models.CharField(max_length=100)
     #delivery = models.ForeignKey(User, on_delete=models.CASCADE) ver si se puede incluir un atributo mas la tabla de user para identificar un user, delivery o store owner
 
     def save(self, *args, **kwargs):

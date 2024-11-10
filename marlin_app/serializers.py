@@ -5,7 +5,7 @@ from .models import DeliveryProfile, Order, OrderItem, UserProfile, Store, Store
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 
@@ -18,6 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password', 'email', 'first_name', 'last_name']
 
+        # def validate_password(self, value):
+        #     if len(value)<8:
+        #         raise serializers.ValidationError('La contraseña debe tener al menos 8 caracteres')
+        
+    def validate_password(self, value):
+        
+        validate_password(password=value)  
+        return value 
     def create(self, validated_data):
         user = User(
             username=validated_data['username'],
@@ -29,6 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         UserProfile.objects.create(user = user)
         return user
+    
 
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
@@ -324,6 +333,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     products = OrderItemSerializer(many=True)
     total_price = serializers.IntegerField(read_only=True)
+    store_coordinates = serializers.CharField(source='store_id.coodernates', read_only=True)
     user_name = serializers.CharField(source='user_id.first_name', read_only=True)
     user_picture = serializers.ImageField(source='user_id.userprofile.picture', read_only=True)
 

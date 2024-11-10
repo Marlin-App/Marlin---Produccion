@@ -37,7 +37,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['store_id']
+    filterset_fields = ['store_id', 'user_id']
 
 class StoreWithItemsViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
