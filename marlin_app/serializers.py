@@ -334,8 +334,11 @@ class OrderSerializer(serializers.ModelSerializer):
     products = OrderItemSerializer(many=True)
     total_price = serializers.IntegerField(read_only=True)
     store_coordinates = serializers.CharField(source='store_id.coodernates', read_only=True)
+    store_photo = serializers.CharField(source='store_id.picture', read_only=True)
     user_name = serializers.CharField(source='user_id.first_name', read_only=True)
+    user_phone = serializers.CharField(source='user_id.userprofile.phone', read_only=True)
     user_picture = serializers.ImageField(source='user_id.userprofile.picture', read_only=True)
+    
 
     class Meta:
         model = Order
