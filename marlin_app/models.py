@@ -228,7 +228,7 @@ class OrderItem(models.Model):
         return super(OrderItem, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.order_id
+        return f"item: {self.item_id.name} de la order {self.order_id.id}"
     
 class Invoice(models.Model):
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE)

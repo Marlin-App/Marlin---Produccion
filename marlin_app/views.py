@@ -1,3 +1,4 @@
+import threading
 import pytz
 from datetime import datetime
 from django.shortcuts import render
@@ -151,12 +152,13 @@ class AcceptOrder(APIView):
         #     {"id": delivery.id, "name": delivery.user_id.first_name}  # Incluye los atributos necesarios
         #     for delivery, _ in deliveries_with_distance[:10]
         # ]
-        asyncio.run(self.assign_order_to_deliveries(order, deliveries_organized))
-        return Response({"message": "Orden aceptada"}, status=status.HTTP_200_OK)
-        
-    async def assign_order_to_deliveries(self, order, deliveries):
+        thread = threading.Thread(target=self.assign_order_to_deliveries, args=(order, deliveries_organized))
+        thread.start()
+        return Response({"message": "Orden lista, buscando repartidor"}, status=status.HTTP_200_OK)
+       
+    def assign_order_to_deliveries(self, order, deliveries):
         for delivery in deliveries:
-            assigned = await self.try_assing_order(order, delivery)
+            assigned = asyncio.run(self.try_assing_order(order, delivery))
             if assigned:
                 print('si se asigno')
                 break
@@ -171,6 +173,7 @@ class AcceptOrder(APIView):
             assigned_at=datetime.now(pytz.timezone("America/Costa_Rica")),
             status='Pendiente'
         )
+        print('creo el resto')
 
         accepted = await self.wait_for_acceptance(delivery_order, timeout=120)
         return accepted
