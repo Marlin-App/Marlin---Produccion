@@ -1,7 +1,7 @@
 import json
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import DeliveryProfile, Order, OrderItem, UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
+from .models import DeliveryOrder, DeliveryProfile, Order, OrderItem, UserProfile, Store, StoreItem, StoreType, ItemTag, AtributeValue, Atribute, ItemVariation, ItemImage
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -415,4 +415,9 @@ class DeliveryProfileSerializer(serializers.ModelSerializer):
             representation['license_picture'] = representation['license_picture'].replace('image/upload/', '')
         return representation
 
-
+class DeliveryOrderSerializer(serializers.ModelSerializer):
+    order_id = OrderSerializer(many=False, read_only=True)
+    class Meta:
+        model = DeliveryOrder
+        fields = '__all__'
+        

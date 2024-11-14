@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import DeliveryProfileSerializer, OrderSerializer, StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer, StoreWithItemsSerializer
-from . models import DeliveryProfile, Order, Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
+from .serializers import DeliveryOrderSerializer, DeliveryProfileSerializer, OrderSerializer, StoreSerializer, UserSerializer, StoreItemSerializer, StoreTypeSerializer, StoreItemTagSerializer, UserProfileSerializer, AtributeValueSerializer, StoreWithItemsSerializer
+from . models import DeliveryOrder, DeliveryProfile, Order, Store, StoreItem, StoreType, ItemTag, UserProfile, AtributeValue
 from .permissions import IsAuthenticatedOrOwner
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -50,3 +50,14 @@ class DeliveryProfileViewSet(viewsets.ModelViewSet):
     serializer_class = DeliveryProfileSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['user_id']
+
+class DeliveryOrderViewSet(viewsets.ModelViewSet):
+    serializer_class = DeliveryOrderSerializer  # Asegúrate de tener un serializer asignado
+    
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'deliveryprofile'):
+            return DeliveryOrder.objects.filter(status='Pendiente', delivery_id=user.deliveryprofile.id)
+        else:
+            return DeliveryOrder.objects.none()
+        

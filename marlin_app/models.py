@@ -261,6 +261,10 @@ class DeliveryProfile(models.Model):
     iD_back_picture = CloudinaryField('image')
     license_picture = CloudinaryField('image')
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='Pendiente')
+    coordinates = models.CharField(max_length=100, null=True, blank=True)
+    is_active = models.BooleanField(default=False)
+    def __str__(self):
+        return f"Repartidor {self.user_id.first_name}"
 
     def save(self, *args, **kwargs):
         cloudinary_fields = ['selfie', 'vehicle_picture', 'iD_front_picture', 'iD_back_picture', 'license_picture']
@@ -279,4 +283,10 @@ class DeliveryProfile(models.Model):
                 setattr(self, field, uploaded_image.get('secure_url', uploaded_image.get('url', '')))
         
         super().save(*args, **kwargs)
+
+class DeliveryOrder(models.Model):
+    delivery_id = models.ForeignKey(DeliveryProfile, on_delete=models.CASCADE)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
+    assigned_at = models.DateTimeField(auto_now_add=True) 
+    status = models.CharField(max_length=20, default='Pendiente')
    
