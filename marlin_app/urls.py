@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from . import viewsets
-from .views import RegisterUserAPIView, PasswordResetRequestView, PasswordResetView, redirect_view, DeleteAccount, AcceptOrder, AcceptDeliveryOrder
+from .views import RegisterUserAPIView, PasswordResetRequestView, PasswordResetView, redirect_view, DeleteAccount, AcceptOrder, AcceptDeliveryOrder, DeclineDeliveryOrder
 
 # Url para las apis
 router = routers.DefaultRouter()
@@ -25,4 +25,5 @@ urlpatterns = [
     path('delete-account/', DeleteAccount.as_view(), name='delete_account'),
     path('accept-order/', AcceptOrder.as_view(), name='accept_order'),
     path('accept-delivery/', AcceptDeliveryOrder.as_view(), name='accept_delivery'),
+    path('decline-delivery/', DeclineDeliveryOrder.as_view(), name='decline_delivery'),
 ]

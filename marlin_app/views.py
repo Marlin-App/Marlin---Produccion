@@ -186,6 +186,8 @@ class AcceptOrder(APIView):
             await sync_to_async(delivery_order.refresh_from_db, thread_sensitive=True)()
             if delivery_order.status == 'Aceptada':
                 return True
+            elif delivery_order.status == 'Rechazada':
+                return False
         await sync_to_async(delivery_order.delete, thread_sensitive=True)()
         return False
 
@@ -206,4 +208,20 @@ class AcceptDeliveryOrder(APIView):
         except DeliveryOrder.DoesNotExist:
             return Response({'error': 'Delivery Order not found'}, status=404)
         return Response({"message": "algo ha salido mal"}, status=status.HTTP_200_OK)
+    
+class DeclineDeliveryOrder(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            delivery_order_id = request.data.get('delivery_order_id')
+            delivery_order = DeliveryOrder.objects.get(id=delivery_order_id)
+            if delivery_order.status == 'Pendiente':
+                delivery_order.status = 'Rechazada'
+                delivery_order.save()
+                return Response({"message": "Orden de reparto rechazada"}, status=status.HTTP_200_OK)
+        except DeliveryOrder.DoesNotExist:
+            return Response({'error': 'Delivery Order not found'}, status=404)
+        return Response({"message": "algo ha salido mal"}, status=status.HTTP_200_OK)
+        
         
