@@ -175,12 +175,13 @@ class AcceptOrder(APIView):
         )
         print('creo el resto')
 
-        accepted = await self.wait_for_acceptance(delivery_order, timeout=120)
+        accepted = await self.wait_for_acceptance(delivery_order, timeout=20)
         return accepted
         
     async def wait_for_acceptance(self, delivery_order, timeout):
         print('continuo')
         for _ in range(int(timeout / 5)):
+            print('espero')
             await asyncio.sleep(5)
             await sync_to_async(delivery_order.refresh_from_db, thread_sensitive=True)()
             if delivery_order.status == 'Aceptada':
