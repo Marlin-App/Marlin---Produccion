@@ -175,7 +175,7 @@ class AcceptOrder(APIView):
         )
         print('creo el resto')
 
-        accepted = await self.wait_for_acceptance(delivery_order, timeout=20)
+        accepted = await self.wait_for_acceptance(delivery_order, timeout=120)
         return accepted
         
     async def wait_for_acceptance(self, delivery_order, timeout):
